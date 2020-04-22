@@ -20,21 +20,25 @@ public:
 
     ~Playground2048();
 
+    void Play();
+
+private:
+    static const int WIDTH = 4, HEIGHT = 4;
+    static const int PROB_4 = 3;
+
+    static std::string ColorNumber(int num);
+
     // returns whether the moving is valid
     bool Move(Direction direction);
 
     // returns whether the game ends
     bool NextStep();
 
-    int GetScore();
+    int GetScore() const;
 
-    void Show();
+    void Show() const;
 
-private:
-    static const int WIDTH = 4, HEIGHT = 4;
-    static const int PROB_4 = 4;
-
-    static std::string ColorNumber(int num);
+    void Reset();
 
     int** matrix;
 

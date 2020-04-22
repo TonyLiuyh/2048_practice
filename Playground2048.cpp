@@ -8,12 +8,20 @@
 #include <vector>
 #include <cmath>
 
+#ifndef WIN
+#define CLEAR_LINE "\33[2K"
+#define PREV_LINE "\033[F"
+#else
+#define CLEAR_LINE ""
+#define PREV_LINE ""
+#endif
+
 Playground2048::Playground2048(int width, int height)
     : matrix(new int*[height])
     , width(width)
     , height(height)
     , score(0) {
-    srand(time(0));
+    srand(time(nullptr));
     for (int i = 0; i < height; ++i) {
         matrix[i] = new int[width];
         for (int j = 0; j < width; ++j) {
@@ -27,6 +35,62 @@ Playground2048::~Playground2048() {
         delete[] matrix[i];
     }
     delete[] matrix;
+}
+
+void Playground2048::Play() {
+    std::cout << std::endl;
+    while (true) {
+        std::string token;
+        while (NextStep()) {
+            Show();
+            bool moved = false;
+            std::cout << "\n" << PREV_LINE << "Enter direction(W/A/S/D): ";
+            while (!moved) {
+                std::getline(std::cin, token);
+                if (token.empty()) {
+                    std::cout << PREV_LINE << "Enter direction(W/A/S/D): ";
+                    continue;
+                }
+                char dir = token[0];
+                if (dir == 'W' || dir == 'w') {
+                    moved = Move(Playground2048::UP);
+                } else if (dir == 'A' || dir == 'a') {
+                    moved = Move(Playground2048::LEFT);
+                } else if (dir == 'S' || dir == 's') {
+                    moved = Move(Playground2048::DOWN);
+                } else if (dir == 'D' || dir == 'd') {
+                    moved = Move(Playground2048::RIGHT);
+                } else {
+                    std::cout << PREV_LINE << CLEAR_LINE << "Invalid direction. Re-enter(W/A/S/D): ";
+                    continue;
+                }
+                if (!moved) {
+                    std::cout << PREV_LINE << CLEAR_LINE << "Cannot move. Re-enter(W/A/S/D): ";
+                }
+            }
+            std::cout << PREV_LINE << CLEAR_LINE;
+            for (int i = 0; i < 10; ++i) {
+                std::cout << PREV_LINE;
+            }
+            std::cout << CLEAR_LINE;
+        }
+
+        Show();
+
+        std::cout << "Game over. Your score: " << GetScore() << ". Play again(Y/N)? ";
+
+        std::getline(std::cin, token);
+        if (token.empty() || (token[0] != 'Y' && token[0] != 'y')) {
+            break;
+        } else {
+            std::cout << PREV_LINE << CLEAR_LINE;
+            for (int i = 0; i < 10; ++i) {
+                std::cout << PREV_LINE;
+            }
+            std::cout << CLEAR_LINE;
+            Reset();
+        }
+    }
 }
 
 bool Playground2048::Move(Playground2048::Direction direction) {
@@ -186,7 +250,7 @@ bool Playground2048::NextStep() {
     }
 }
 
-void Playground2048::Show() {
+void Playground2048::Show() const {
     std::cout << "     Score: " << score << std::endl;
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
@@ -195,7 +259,8 @@ void Playground2048::Show() {
         std::cout << "+" << std::endl;
 
         for (int j = 0; j < width; ++j) {
-            std::cout << "\x1b[0m" << "|";
+            std::cout << ColorNumber(0);
+            std::cout << "|";
             std::cout << ColorNumber(matrix[i][j]);
             if (matrix[i][j] == 0) {
                 std::cout << "    ";
@@ -209,7 +274,8 @@ void Playground2048::Show() {
                 std::cout << matrix[i][j];
             }
         }
-        std::cout << "\x1b[0m" << "|" << std::endl;
+        std::cout << ColorNumber(0);
+        std::cout << "|" << std::endl;
     }
     for (int j = 0; j < width; ++j) {
         std::cout << "+----";
@@ -217,34 +283,47 @@ void Playground2048::Show() {
     std::cout << "+" << std::endl;
 }
 
-int Playground2048::GetScore() {
+int Playground2048::GetScore() const {
     return score;
 }
 
+void Playground2048::Reset() {
+    score = 0;
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            matrix[i][j] = 0;
+        }
+    }
+}
+
 std::string Playground2048::ColorNumber(int num) {
-    if (num == 4) {
-        return "\x1b[30;42m";
-    } else if (num == 8) {
-        return "\x1b[30;43m";
-    } else if (num == 16) {
-        return "\x1b[37;44m";
-    } else if (num == 32) {
-        return "\x1b[30;45m";
-    } else if (num == 64) {
-        return "\x1b[30;46m";
-    } else if (num == 128) {
-        return "\x1b[37;41m";
-    } else if (num == 256) {
-        return "\x1b[30;40m";
-    } else if (num == 512) {
-        return "\x1b[37;42m";
-    } else if (num == 1024) {
-        return "\x1b[37;43m";
-    } else if (num == 2048) {
-        return "\x1b[37;46m";
-    } else if (num == 4096) {
-        return "\x1b[37;41m";
-    } else {
-        return "\x1b[0m";
+#ifdef WIN
+    return "";
+#endif
+    switch (num) {
+        case 4:
+            return "\x1b[30;42m";
+        case 8:
+            return "\x1b[30;43m";
+        case 16:
+            return "\x1b[37;44m";
+        case 32:
+            return "\x1b[30;45m";
+        case 64:
+            return "\x1b[30;46m";
+        case 128:
+            return "\x1b[37;41m";
+        case 256:
+            return "\x1b[37;40m";
+        case 512:
+            return "\x1b[37;42m";
+        case 1024:
+            return "\x1b[37;43m";
+        case 2048:
+            return "\x1b[37;46m";
+        case 4096:
+            return "\x1b[33;41m";
+        default:
+            return "\x1b[0m";
     }
 }

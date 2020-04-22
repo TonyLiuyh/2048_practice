@@ -1,0 +1,6 @@
+/cmake-build-debug/
+/.idea/
+/build_mac/CMakeFiles/
+/build_mac/cmake_install.cmake
+/build_mac/CMakeCache.txt
+/build_mac/Makefile
