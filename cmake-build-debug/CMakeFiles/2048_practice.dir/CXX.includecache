@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/apple/Desktop/2048_practice/Playground2048.cpp
+Playground2048.h
+/Users/apple/Desktop/2048_practice/Playground2048.h
+algorithm
+-
+iostream
+-
+vector
+-
+cmath
+-
+
+/Users/apple/Desktop/2048_practice/Playground2048.h
+string
+-
+
+/Users/apple/Desktop/2048_practice/main.cpp
+iostream
+-
+Playground2048.h
+/Users/apple/Desktop/2048_practice/Playground2048.h
+
